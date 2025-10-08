@@ -1,7 +1,7 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title>
-      Tab 2
+      Jogo
     </ion-title>
   </ion-toolbar>
 </ion-header>
@@ -9,9 +9,56 @@
 <ion-content [fullscreen]="true">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">Tab 2</ion-title>
+      <ion-title size="large"></ion-title>
     </ion-toolbar>
   </ion-header>
 
-  <ion-input-otp type="text" pattern="." value=""> All characters allowed </ion-input-otp>
+  <h1 class="daysport-title">
+    DAY<span class="sport-green">SPORT</span>
+  </h1>
+
+  <ion-card class="custom-card">
+    <ion-card-header>
+      <ion-card-title>Tente acertar o time de hoje!</ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+      <div class="icon-row">
+        <div class="icon-item" (click)="showHint('O time tem camisa preta e branca')">
+          <ion-icon name="shirt-outline" color="dark"></ion-icon>
+          <ion-label>Dica da cor da Camisa</ion-label>
+        </div>
+
+        <div class="icon-item" (click)="showHint('O time tem 4 títulos nacionais')">
+          <ion-icon name="trophy-outline" color="warning"></ion-icon>
+          <ion-label>Dica de Títulos</ion-label>
+        </div>
+
+        <div class="icon-item" (click)="showHint('O time é do Rio de Janeiro')">
+          <ion-icon name="map-outline" color="primary"></ion-icon>
+          <ion-label>Dica do Estado</ion-label>
+        </div>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  <div *ngIf="currentHint" class="hint-container">
+    <ion-card>
+      <ion-card-content>
+        {{ currentHint }}
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <br /><br />
+
+<ion-input-otp
+  type="text"
+  pattern="."
+  [length]="otpLength"
+  (ionInput)="onInputChange($event)">
+</ion-input-otp>
+
+<ion-button expand="block" (click)="checkAnswer()">Enviar</ion-button>
+
 </ion-content>
