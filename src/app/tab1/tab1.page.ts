@@ -1,11 +1,5 @@
 import { Component } from '@angular/core';
-import {
-  IonContent,
-  IonIcon,
-  IonButton,
-  IonCheckbox,
-  IonLabel
-} from '@ionic/angular/standalone';
+import {} from '@ionic/angular/standalone';
 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -18,11 +12,6 @@ import { FormsModule } from '@angular/forms';
   imports: [
     CommonModule,
     FormsModule,
-    IonContent,
-    IonIcon,
-    IonButton,
-    IonCheckbox,
-    IonLabel
   ],
 })
 export class Tab1Page {

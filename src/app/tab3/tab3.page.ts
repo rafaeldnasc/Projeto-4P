@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonAvatar, IonButton } from '@ionic/angular/standalone';
+import { IonContent, IonAvatar, IonButton } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-tab3',
   templateUrl: 'tab3.page.html',
   styleUrls: ['tab3.page.scss'],
-  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonAvatar, IonButton],
+  imports: [ IonContent, IonAvatar, IonButton],
 })
 export class Tab3Page {
 
