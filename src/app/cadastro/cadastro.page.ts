@@ -1,95 +1,51 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
-import { 
-  IonHeader, 
-  IonToolbar, 
-  IonTitle, 
-  IonContent, 
-  IonItem, 
-  IonLabel, 
-  IonInput, 
-  IonButton, 
-  IonList, 
-  IonIcon,
-  IonBackButton,
-  IonButtons,
-  AlertController, 
-  LoadingController 
-} from '@ionic/angular/standalone';
-import { CommonModule } from '@angular/common';
+import { Component } from '@angular/core';
+import { Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { IonContent, IonItem, IonInput, IonButton } from '@ionic/angular/standalone';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-cadastro',
+  standalone: true,
   templateUrl: './cadastro.page.html',
   styleUrls: ['./cadastro.page.scss'],
-  standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    RouterModule,
-    IonHeader,
-    IonToolbar,
-    IonTitle,
-    IonContent,
-    IonItem,
-    IonLabel,
-    IonInput,
-    IonButton,
-    IonList,
-    IonIcon,
-    IonBackButton,
-    IonButtons
-  ]
+  imports: [IonContent, IonItem, IonInput, IonButton, FormsModule]
 })
-export class CadastroPage implements OnInit {
-  cadastroForm: FormGroup;
+export class CadastroPage {
+
+  email: string = '';
+  senha: string = '';
 
   constructor(
-    private formBuilder: FormBuilder,
-    private router: Router,
-    private alertController: AlertController,
-    private loadingController: LoadingController
-  ) {
-    this.cadastroForm = this.formBuilder.group({
-      name: ['', [Validators.required, Validators.minLength(2)]],
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]]
-    });
-  }
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
-  ngOnInit() {}
+  async cadastrar() {
+    if (!this.email || !this.senha) {
+      alert('Preencha o email e a senha.');
+      return;
+    }
 
-  async onCadastro() {
-    if (this.cadastroForm.valid) {
-      const loading = await this.loadingController.create({
-        message: 'Criando conta...',
-      });
-      await loading.present();
+    try {
+      await this.authService.signup(this.email, this.senha);
 
-      // Simulação de cadastro
-      setTimeout(async () => {
-        await loading.dismiss();
-        
-        const userData = this.cadastroForm.value;
-        console.log('Dados do usuário:', userData);
-        
-        this.showAlert('Sucesso', 'Conta criada com sucesso!');
-        this.router.navigate(['/login']);
-      }, 1500);
+      alert('Conta criada com sucesso!');
+
+      // redireciona para o login
+      this.router.navigateByUrl('/tab1', { replaceUrl: true });
+
+    } catch (error: any) {
+      console.error(error);
+      alert('Erro: ' + error.message);
     }
   }
 
-  goToLogin() {
-    this.router.navigate(['/login']);
+  voltarLogin() {
+    this.router.navigateByUrl('/login', { replaceUrl: true });
   }
 
-  async showAlert(header: string, message: string) {
-    const alert = await this.alertController.create({
-      header,
-      message,
-      buttons: ['OK']
-    });
-    await alert.present();
+  voltarRegras() {
+    this.router.navigateByUrl('/tabs/tab1', { replaceUrl: true });
   }
 }

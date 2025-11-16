@@ -1,33 +1,34 @@
 <ion-content>
   <div class="simple-profile">
-    
+
     <!-- Avatar e Nome -->
     <div class="user-info">
       <ion-avatar>
         <img [src]="avatar" alt="Foto do usuário" />
       </ion-avatar>
-      <h2>{{name}}</h2>
+      <h2>{{ name }}</h2>
+      <p class="email">{{ email }}</p>
     </div>
 
     <!-- Estatísticas Básicas -->
     <div class="simple-stats">
       <div class="stat">
-        <strong>{{totalGames}}</strong>
+        <strong>{{ totalGames }}</strong>
         <span>Jogos</span>
       </div>
       <div class="stat">
-        <strong>{{victories}}</strong>
+        <strong>{{ victories }}</strong>
         <span>Vitórias</span>
       </div>
       <div class="stat">
-        <strong>{{currentStreak}}</strong>
+        <strong>{{ currentStreak }}</strong>
         <span>Sequência</span>
       </div>
     </div>
 
-    <!-- Botão de Ação -->
-    <ion-button expand="block" (click)="editProfile()">
-      Editar Perfil
+    <!-- Botão -->
+    <ion-button color="danger" expand="block" (click)="logout()">
+      Sair
     </ion-button>
 
   </div>

@@ -1,78 +1,33 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-back-button defaultHref="/login"></ion-back-button>
-    </ion-buttons>
-    <ion-title>Cadastro</ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-content class="ion-padding">
 
-<ion-content [fullscreen]="true" class="ion-padding">
-  <div class="cadastro-container">
-    <div class="logo-section">
-      <ion-icon name="person-add" class="logo-icon"></ion-icon>
-      <h2>Criar Conta</h2>
-      <p>Preencha os dados para se cadastrar</p>
-    </div>
+  <h2>Crie sua conta</h2>
 
-    <form [formGroup]="cadastroForm" (ngSubmit)="onCadastro()">
-      <ion-list>
-        <ion-item>
-          <ion-label position="stacked">Nome</ion-label>
-          <ion-input 
-            type="text" 
-            formControlName="name"
-            placeholder="Seu nome"
-            required>
-          </ion-input>
-        </ion-item>
-        <div class="error-message" *ngIf="cadastroForm.get('name')?.invalid && cadastroForm.get('name')?.touched">
-          <span *ngIf="cadastroForm.get('name')?.errors?.['required']">Nome é obrigatório</span>
-          <span *ngIf="cadastroForm.get('name')?.errors?.['minlength']">Mínimo 2 caracteres</span>
-        </div>
+  <ion-item>
+    <ion-input
+      placeholder="Email"
+      type="email"
+      [(ngModel)]="email">
+    </ion-input>
+  </ion-item>
 
-        <ion-item>
-          <ion-label position="stacked">Email</ion-label>
-          <ion-input 
-            type="email" 
-            formControlName="email"
-            placeholder="seu@email.com"
-            required>
-          </ion-input>
-        </ion-item>
-        <div class="error-message" *ngIf="cadastroForm.get('email')?.invalid && cadastroForm.get('email')?.touched">
-          <span *ngIf="cadastroForm.get('email')?.errors?.['required']">Email é obrigatório</span>
-          <span *ngIf="cadastroForm.get('email')?.errors?.['email']">Email inválido</span>
-        </div>
+  <ion-item>
+    <ion-input
+      placeholder="Senha"
+      type="password"
+      [(ngModel)]="senha">
+    </ion-input>
+  </ion-item>
 
-        <ion-item>
-          <ion-label position="stacked">Senha</ion-label>
-          <ion-input 
-            type="password" 
-            formControlName="password"
-            placeholder="Mínimo 6 caracteres"
-            required>
-          </ion-input>
-        </ion-item>
-        <div class="error-message" *ngIf="cadastroForm.get('password')?.invalid && cadastroForm.get('password')?.touched">
-          <span *ngIf="cadastroForm.get('password')?.errors?.['required']">Senha é obrigatória</span>
-          <span *ngIf="cadastroForm.get('password')?.errors?.['minlength']">Mínimo 6 caracteres</span>
-        </div>
-      </ion-list>
+  <ion-button expand="block" (click)="cadastrar()">
+    Cadastrar
+  </ion-button>
 
-      <ion-button 
-        type="submit" 
-        expand="block" 
-        class="cadastro-button"
-        [disabled]="!cadastroForm.valid">
-        Cadastrar
-      </ion-button>
-    </form>
+  <ion-button expand="block" fill="clear" (click)="voltarLogin()">
+    Já tenho conta
+  </ion-button>
 
-    <div class="login-section">
-      <p>Já tem uma conta? 
-        <a (click)="goToLogin()">Faça login</a>
-      </p>
-    </div>
-  </div>
+    <ion-button expand="block" (click)="voltarRegras()">
+  Voltar para Regras
+</ion-button>
+
 </ion-content>

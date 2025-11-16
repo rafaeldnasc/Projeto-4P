@@ -1,61 +1,24 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>Login</ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-content class="ion-padding">
+  <ion-item>
+    <ion-input placeholder="Email" [(ngModel)]="email" type="email"></ion-input>
+  </ion-item>
 
-<ion-content [fullscreen]="true" class="ion-padding">
-  <div class="login-container">
-    <div class="logo-section">
-      <ion-icon name="log-in" class="logo-icon"></ion-icon>
-      <h2>Bem-vindo</h2>
-      <p>Faça login na sua conta</p>
-    </div>
+  <ion-item>
+    <ion-input placeholder="Senha" [(ngModel)]="senha" type="password"></ion-input>
+  </ion-item>
 
-    <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
-      <ion-list>
-        <ion-item>
-          <ion-label position="stacked">Email</ion-label>
-          <ion-input 
-            type="email" 
-            formControlName="email"
-            placeholder="seu@email.com"
-            required>
-          </ion-input>
-        </ion-item>
-        <div class="error-message" *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
-          <span *ngIf="loginForm.get('email')?.errors?.['required']">Email é obrigatório</span>
-          <span *ngIf="loginForm.get('email')?.errors?.['email']">Email inválido</span>
-        </div>
+  <ion-button expand="block" (click)="login()">Entrar</ion-button>
 
-        <ion-item>
-          <ion-label position="stacked">Senha</ion-label>
-          <ion-input 
-            type="password" 
-            formControlName="password"
-            placeholder="Sua senha"
-            required>
-          </ion-input>
-        </ion-item>
-        <div class="error-message" *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
-          <span *ngIf="loginForm.get('password')?.errors?.['required']">Senha é obrigatória</span>
-          <span *ngIf="loginForm.get('password')?.errors?.['minlength']">Mínimo 6 caracteres</span>
-        </div>
-      </ion-list>
+  <ion-button expand="block" (click)="voltarRegras()">
+  Voltar para Regras
+</ion-button>
 
-      <ion-button 
-        type="submit" 
-        expand="block" 
-        class="login-button"
-        [disabled]="!loginForm.valid">
-        Entrar
-      </ion-button>
-    </form>
+<div style="text-align: center; margin-top: 16px;">
+  <ion-button fill="clear" (click)="goToCadastro()">
+    Não tem conta? Cadastre-se
+  </ion-button>
+</div>
 
-    <div class="cadastro-section">
-      <p>Não tem uma conta? 
-        <a (click)="goToCadastro()">Cadastre-se</a>
-      </p>
-    </div>
-  </div>
+
+
 </ion-content>

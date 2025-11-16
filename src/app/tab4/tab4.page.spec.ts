@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Page4Page } from './page4.page';
+import { Page4Page } from './tab4.page';
 
 describe('Page4Page', () => {
   let component: Page4Page;

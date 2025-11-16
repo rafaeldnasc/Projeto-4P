@@ -1,94 +1,40 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
-import { 
-  IonHeader, 
-  IonToolbar, 
-  IonTitle, 
-  IonContent, 
-  IonItem, 
-  IonLabel, 
-  IonInput, 
-  IonButton, 
-  IonList, 
-  IonIcon,
-  AlertController, 
-  LoadingController 
-} from '@ionic/angular/standalone';
+import { Component } from '@angular/core';
+import { Router } from '@angular/router';
+import { Auth, signInWithEmailAndPassword } from '@angular/fire/auth';
+import { IonicModule } from '@ionic/angular';
+import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-login',
+  standalone: true,
+  imports: [IonicModule, FormsModule, CommonModule],
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
-  standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    RouterModule,
-    IonHeader,
-    IonToolbar,
-    IonTitle,
-    IonContent,
-    IonItem,
-    IonLabel,
-    IonInput,
-    IonButton,
-    IonList,
-    IonIcon
-  ]
 })
-export class LoginPage implements OnInit {
-  loginForm: FormGroup;
+export class LoginPage {
+  email: string = '';
+  senha: string = '';
 
-  constructor(
-    private formBuilder: FormBuilder,
-    private router: Router,
-    private alertController: AlertController,
-    private loadingController: LoadingController
-  ) {
-    this.loginForm = this.formBuilder.group({
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]]
-    });
-  }
+  constructor(private auth: Auth, private router: Router) {}
 
-  ngOnInit() {}
-
-  async onLogin() {
-    if (this.loginForm.valid) {
-      const loading = await this.loadingController.create({
-        message: 'Entrando...',
-      });
-      await loading.present();
-
-      // Simulação de login
-      setTimeout(async () => {
-        await loading.dismiss();
-        
-        const email = this.loginForm.value.email;
-        const password = this.loginForm.value.password;
-        
-        // Login simulado para demonstração
-        if (email && password) {
-          this.router.navigate(['/home']);
-        } else {
-          this.showAlert('Erro', 'Email ou senha incorretos!');
-        }
-      }, 1000);
+  async login() {
+    try {
+      await signInWithEmailAndPassword(this.auth, this.email, this.senha);
+      // redireciona para tab1 após login
+      await this.router.navigateByUrl('/tabs/tab1', { replaceUrl: true });
+    } catch (error: any) {
+      console.error('Erro no login:', error);
+      alert('Erro ao entrar: ' + error.message);
     }
   }
 
-  goToCadastro() {
-    this.router.navigate(['/cadastro']);
+  voltarRegras() {
+    this.router.navigateByUrl('/tabs/tab1', { replaceUrl: true });
   }
 
-  async showAlert(header: string, message: string) {
-    const alert = await this.alertController.create({
-      header,
-      message,
-      buttons: ['OK']
-    });
-    await alert.present();
-  }
+  goToCadastro() {
+  this.router.navigateByUrl('/cadastro');
+}
+
 }
