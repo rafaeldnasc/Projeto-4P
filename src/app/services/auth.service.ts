@@ -32,7 +32,7 @@ export class AuthService {
     }
   }
 
-  signup(email: string, password: string) {
+  signup(name: string, email: string, password: string) {
     return createUserWithEmailAndPassword(this.auth, email, password)
       .then(async (cred) => {
 
@@ -41,7 +41,7 @@ export class AuthService {
 
         // cria o documento no Firestore
         await setDoc(doc(this.firestore, `users/${uid}`), {
-          name: user.displayName || 'Novo Usuário',
+          name: name,
           email: user.email,
           totalGames: 0,
           victories: 0,

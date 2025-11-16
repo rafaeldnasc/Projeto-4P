@@ -13,6 +13,7 @@ import { AuthService } from '../services/auth.service';
 })
 export class CadastroPage {
 
+  name: string = '';
   email: string = '';
   senha: string = '';
 
@@ -22,24 +23,23 @@ export class CadastroPage {
   ) {}
 
   async cadastrar() {
-    if (!this.email || !this.senha) {
-      alert('Preencha o email e a senha.');
-      return;
-    }
-
-    try {
-      await this.authService.signup(this.email, this.senha);
-
-      alert('Conta criada com sucesso!');
-
-      // redireciona para o login
-      this.router.navigateByUrl('/tab1', { replaceUrl: true });
-
-    } catch (error: any) {
-      console.error(error);
-      alert('Erro: ' + error.message);
-    }
+  if (!this.email || !this.senha || !this.name) {
+    alert('Preencha nome, email e senha.');
+    return;
   }
+
+  try {
+    await this.authService.signup(this.name, this.email, this.senha);
+
+    alert('Conta criada com sucesso!');
+    this.router.navigateByUrl('/tab1', { replaceUrl: true });
+
+  } catch (error: any) {
+    console.error(error);
+    alert('Erro: ' + error.message);
+  }
+}
+
 
   voltarLogin() {
     this.router.navigateByUrl('/login', { replaceUrl: true });

@@ -4,6 +4,14 @@
 
   <ion-item>
     <ion-input
+      placeholder="Nome"
+      type="text"
+      [(ngModel)]="name">
+    </ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-input
       placeholder="Email"
       type="email"
       [(ngModel)]="email">
@@ -26,8 +34,8 @@
     Já tenho conta
   </ion-button>
 
-    <ion-button expand="block" (click)="voltarRegras()">
-  Voltar para Regras
-</ion-button>
+  <ion-button expand="block" (click)="voltarRegras()">
+    Voltar para Regras
+  </ion-button>
 
 </ion-content>

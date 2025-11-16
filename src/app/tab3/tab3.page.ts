@@ -2,11 +2,13 @@ import { Component } from '@angular/core';
 import { IonContent, IonAvatar, IonButton } from '@ionic/angular/standalone';
 import { AuthService } from '../services/auth.service';
 import { Router } from '@angular/router';
+import { DarkToggleComponent } from '../components/dark-mode/dark-mode.component';
+
 
 @Component({
   selector: 'app-tab3',
   standalone: true,
-  imports: [IonContent, IonAvatar, IonButton],
+  imports: [IonContent, IonAvatar, IonButton, DarkToggleComponent],
   templateUrl: 'tab3.page.html',
   styleUrls: ['tab3.page.scss'],
 })
