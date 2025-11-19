@@ -1,56 +1,138 @@
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large"></ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <div class="header-section">
+    <h1 class="daysport-title">
+      DAY<span class="sport-green">SPORT</span>
+    </h1>
+    
+    <div class="score-board">
+      <ion-chip color="success">
+        <ion-icon name="trophy" color="warning"></ion-icon>
+        <ion-label>Pontuação: {{ score }}</ion-label>
+      </ion-chip>
+    </div>
+  </div>
 
-  <h1 class="daysport-title">
-    DAY<span class="sport-green">SPORT</span>
-  </h1>
-
-  <ion-card class="custom-card">
+  <!-- Seletor de Liga -->
+  <ion-card class="league-selector">
     <ion-card-header>
-      <ion-card-title>Tente acertar o time de hoje!</ion-card-title>
+      <ion-card-title>🎯 Escolha a Liga</ion-card-title>
+      <ion-card-subtitle>Adivinhe o time desta liga</ion-card-subtitle>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-segment [value]="selectedLeague" (ionChange)="changeLeague($event)">
+        <ion-segment-button *ngFor="let league of leagues" [value]="league.id">
+          <ion-label>{{ league.name }}</ion-label>
+        </ion-segment-button>
+      </ion-segment>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="loading-container">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Carregando time...</p>
+  </div>
+
+  <ion-card class="custom-card" *ngIf="currentTeam && !isLoading">
+    <ion-card-header>
+      <ion-card-title>🔍 Adivinhe o Time!</ion-card-title>
+      <ion-card-subtitle>
+       <strong>{{ getLeagueName() }}</strong> 
+      </ion-card-subtitle>
     </ion-card-header>
 
     <ion-card-content>
+      <!-- Escudo do time 
+      <div class="team-crest-container">
+        <img 
+          [src]="getTeamCrest()" 
+          [alt]="currentTeam.shortName" 
+          class="team-crest"
+          [class.revealed]="gameOver">
+        <div class="league-badge">{{ getLeagueName() }}</div>
+      </div>
+    -->
+      <!-- Dicas -->
+          <!-- Dicas -->
       <div class="icon-row">
-        <div class="icon-item" (click)="showHint('O time tem camisa preta e branca')">
-          <ion-icon name="shirt-outline" color="dark"></ion-icon>
-          <ion-label>Dica da cor da Camisa</ion-label>
-        </div>
 
-        <div class="icon-item" (click)="showHint('O time tem 4 títulos nacionais')">
-          <ion-icon name="trophy-outline" color="warning"></ion-icon>
-          <ion-label>Dica de Títulos</ion-label>
-        </div>
+        <ion-card class="hint-card" (click)="showHint('colors')">
+          <div class="icon-item">
+            <ion-icon name="color-palette-outline"></ion-icon>
+            <ion-label>Cores</ion-label>
+          </div>
+        </ion-card>
 
-        <div class="icon-item" (click)="showHint('O time é do Rio de Janeiro')">
-          <ion-icon name="map-outline" color="primary"></ion-icon>
-          <ion-label>Dica do Estado</ion-label>
-        </div>
+       
+
+        <ion-card class="hint-card" (click)="showHint('stadium')">
+          <div class="icon-item">
+            <ion-icon name="business-outline"></ion-icon>
+            <ion-label>Estádio</ion-label>
+          </div>
+        </ion-card>
+
+      
+
+        <ion-card class="hint-card" (click)="showHint('city')">
+          <div class="icon-item">
+            <ion-icon name="location-outline"></ion-icon>
+            <ion-label>Cidade</ion-label>
+          </div>
+        </ion-card>
+
+      </div>
+
+      <div class="attempts-counter" [class.warning]="attempts === 1">
+        🎯 Tentativas: {{ attempts }}
       </div>
     </ion-card-content>
   </ion-card>
 
+  <!-- Área de Dicas -->
   <div *ngIf="currentHint" class="hint-container">
-    <ion-card>
+    <ion-card [color]="won ? 'success' : gameOver ? 'danger' : 'primary'">
       <ion-card-content>
+        <ion-icon 
+          [name]="won ? 'trophy' : gameOver ? 'sad' : 'bulb'" 
+          slot="start">
+        </ion-icon>
         {{ currentHint }}
       </ion-card-content>
     </ion-card>
   </div>
 
-  <br /><br />
-
-<ion-input-otp
+  <!-- Input para resposta -->
+  <div class="input-section" *ngIf="!gameOver && currentTeam && !isLoading">
+    <ion-text color="medium">
+      <p class="input-label">Digite o nome do time da {{ getLeagueName() }}:</p>
+    </ion-text>
+    
+  <ion-input
   type="text"
-  pattern="."
-  [length]="otpLength"
+  placeholder="Digite o nome do time"
+  [disabled]="gameOver"
   (ionInput)="onInputChange($event)">
-</ion-input-otp>
+</ion-input>
 
-<ion-button expand="block" (click)="checkAnswer()">Enviar</ion-button>
+   <ion-button 
+  expand="block" 
+  (click)="checkAnswer()"
+  [disabled]="userGuess.length < 1"
+  color="primary">
+   Enviar
+</ion-button>
 
+  </div>
+  
+
+  <!-- Botão para novo jogo -->
+  <div class="new-game-section" *ngIf="gameOver && !isLoading">
+    <ion-button 
+      expand="block" 
+      fill="outline"
+      (click)="loadRandomTeam()">
+      🎮 Jogar Novamente
+    </ion-button>
+  </div>
 </ion-content>
