@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 
-// IMPORTAR ISSO ↓↓↓
+// IMPORTAR MÓDULOS ESSENCIAIS ↓↓↓
 import { CommonModule } from '@angular/common';
 import {
   IonContent,
@@ -23,7 +23,7 @@ import { RankingService } from '../services/ranking.service';
 
   // IMPORTANTE ↓↓↓
   imports: [
-    CommonModule,       // habilita *ngFor, *ngIf
+    CommonModule,
     IonContent,
     IonList,
     IonItem,
@@ -40,21 +40,27 @@ export class Tab4Page implements OnInit {
 
   constructor(private rankingService: RankingService) {}
 
- // tab4.page.ts
-ngOnInit() {
-  this.rankingService.getRanking().subscribe({
-    next: (data) => {
-      console.log("dados recebidos:", data);
-      this.ranking = data;
-    },
-    error: (err) => {
-      // ESTE É O PONTO CRÍTICO: CAPTURAR O ERRO
-      console.error("Erro ao buscar ranking:", err);
-    },
-    complete: () => {
-      console.log("Busca de ranking completa.");
-    }
-  });
-}
+  ngOnInit() {
+    this.carregarRanking();
+  }
+
+  // 🔥 Função separada melhora legibilidade e manutenção
+  carregarRanking() {
+    this.rankingService.getRanking().subscribe({
+      next: (data) => {
+        console.log("Dados recebidos:", data);
+        this.ranking = data;
+      },
+      error: (err) => {
+        console.error("Erro ao buscar ranking:", err);
+
+        // Aqui você pode usar o ToastController depois
+        // this.toastService.error("Não foi possível carregar o ranking.");
+      },
+      complete: () => {
+        console.log("Busca de ranking finalizada.");
+      }
+    });
+  }
 
 }

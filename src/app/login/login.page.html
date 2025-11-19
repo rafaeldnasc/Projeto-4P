@@ -1,24 +1,51 @@
 <ion-content class="ion-padding">
-  <ion-item>
-    <ion-input placeholder="Email" [(ngModel)]="email" type="email"></ion-input>
-  </ion-item>
 
-  <ion-item>
-    <ion-input placeholder="Senha" [(ngModel)]="senha" type="password"></ion-input>
-  </ion-item>
+  <div class="login-container">
 
-  <ion-button expand="block" (click)="login()">Entrar</ion-button>
+    <h2>Entrar</h2>
 
-  <ion-button expand="block" (click)="voltarRegras()">
-  Voltar para Regras
-</ion-button>
+    <form [formGroup]="form" class="form-box">
 
-<div style="text-align: center; margin-top: 16px;">
-  <ion-button fill="clear" (click)="goToCadastro()">
-    Não tem conta? Cadastre-se
-  </ion-button>
-</div>
+      <ion-item>
+        <ion-input
+          label="Email"
+          labelPlacement="floating"
+          type="email"
+          formControlName="email">
+        </ion-input>
+      </ion-item>
+      <p class="erro" *ngIf="form.get('email')?.touched && form.get('email')?.invalid">
+        {{ getErro('email') }}
+      </p>
 
+      <ion-item>
+        <ion-input
+          label="Senha"
+          labelPlacement="floating"
+          type="password"
+          formControlName="senha">
+        </ion-input>
+      </ion-item>
+      <p class="erro" *ngIf="form.get('senha')?.touched && form.get('senha')?.invalid">
+        {{ getErro('senha') }}
+      </p>
 
+      <ion-button expand="block" class="main-btn" (click)="login()" [disabled]="form.invalid">
+        Entrar
+      </ion-button>
+
+    </form>
+
+    <ion-button expand="block" fill="clear" class="small-btn" (click)="voltarRegras()">
+      Voltar para Regras
+    </ion-button>
+
+    <ion-button expand="block" fill="clear" class="small-btn" (click)="goToCadastro()">
+      Não tem conta? Cadastre-se
+    </ion-button>
+
+  </div>
+
+  <ion-toast #toast position="bottom"></ion-toast>
 
 </ion-content>

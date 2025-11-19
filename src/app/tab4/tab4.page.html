@@ -6,23 +6,31 @@
 
 <ion-content>
   <ion-list>
-    <ion-item *ngFor="let user of ranking">
+
+    <ion-item *ngFor="let user of ranking; let i = index" lines="none" class="rank-item">
+
+      <!-- Posição -->
+      <div class="position" slot="start">
+        {{ i + 1 }}
+      </div>
+
       <!-- Avatar -->
-      <ion-avatar slot="start">
-        <img alt="Avatar" src="https://ionicframework.com/docs/img/demos/avatar.svg" />
+      <ion-avatar class="rank-avatar">
+        <img src="https://ionicframework.com/docs/img/demos/avatar.svg" alt="Avatar">
       </ion-avatar>
 
       <!-- Nome + Nível -->
       <ion-label>
-        <h3>{{ user.name }}</h3>
+        <h2>{{ user.name }}</h2>
         <p>Nível {{ user.level || 1 }}</p>
       </ion-label>
 
-      <!-- Pontuação -->
-      <div slot="end" class="score">
+      <!-- Pontos -->
+      <div class="points">
         {{ user.points | number:'1.0-0' }} pts
       </div>
+
     </ion-item>
+
   </ion-list>
 </ion-content>
-

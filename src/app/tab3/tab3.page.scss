@@ -1,49 +1,55 @@
 .simple-profile {
+  padding: 24px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: 20px;
+  align-items: center;     // centraliza tudo
+  width: 100%;
 }
 
 .user-info {
   text-align: center;
-  margin-bottom: 20px;
+  width: 100%;
 }
 
-.user-info ion-avatar {
+.avatar {
   width: 120px;
   height: 120px;
-  margin: 0 auto 10px;
-  border: 3px solid #3880ff;
-  border-radius: 50%;
+  margin: 0 auto 12px auto;
+  display: block;
 }
 
 .user-info h2 {
-  margin: 5px 0;
+  margin: 6px 0 2px;
+  font-weight: 600;
 }
 
 .user-info .email {
-  font-size: 14px;
-  color: #555;
+  color: var(--ion-color-medium);
+  font-size: 0.9rem;
 }
 
 .simple-stats {
-  display: flex;
-  justify-content: space-around;
   width: 100%;
-  margin-bottom: 25px;
+  display: flex;
+  justify-content: space-between;   // Corrige tortura!
+  align-items: center;
+  padding: 16px;
+  margin-top: 20px;
+  border-radius: 15px;
+
+  background: var(--ion-card-background, rgba(0, 0, 0, 0.06));
 }
 
 .stat {
   text-align: center;
+  flex: 1;                 // cada bloco fica do mesmo tamanho
 }
 
 .stat strong {
-  font-size: 22px;
+  font-size: 1.3rem;
   display: block;
 }
 
-.stat span {
-  font-size: 14px;
-  color: #666;
+.dark-toggle-container {
+  margin-top: 16px;
 }

@@ -1,12 +1,12 @@
-// ranking.service.ts (CÓDIGO CORRIGIDO)
-
 import { Injectable, inject } from '@angular/core';
 import { 
   Firestore, 
   collection, 
   collectionData, 
-  query // <--- 1. ESTA IMPORTAÇÃO É ESSENCIAL
+  query,
+  orderBy
 } from '@angular/fire/firestore';
+import { map } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class RankingService {
@@ -15,12 +15,14 @@ export class RankingService {
 
   getRanking() {
     const usersRef = collection(this.firestore, 'users');
-    
-    // 2. É NECESSÁRIO ENVOLVER A REFERÊNCIA DA COLEÇÃO NA FUNÇÃO 'query'
-    const queryRef = query(usersRef); 
-    
-    // 3. collectionData deve receber a queryRef, não a usersRef
-    return collectionData(queryRef, { idField: 'id' });
+
+    // ordenar pelo campo "points" DESC
+    const queryRef = query(usersRef, orderBy('points', 'desc'));
+
+    return collectionData(queryRef, { idField: 'id' }).pipe(
+      map((data: any[]) =>
+        data.sort((a, b) => (b.points || 0) - (a.points || 0)) // redundância de segurança
+      )
+    );
   }
 }
-

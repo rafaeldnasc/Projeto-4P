@@ -1,41 +1,66 @@
 <ion-content class="ion-padding">
 
-  <h2>Crie sua conta</h2>
+  <div class="cadastro-container">
 
-  <ion-item>
-    <ion-input
-      placeholder="Nome"
-      type="text"
-      [(ngModel)]="name">
-    </ion-input>
-  </ion-item>
+    <h2>Crie sua conta</h2>
 
-  <ion-item>
-    <ion-input
-      placeholder="Email"
-      type="email"
-      [(ngModel)]="email">
-    </ion-input>
-  </ion-item>
+    <form [formGroup]="form" class="form-box">
 
-  <ion-item>
-    <ion-input
-      placeholder="Senha"
-      type="password"
-      [(ngModel)]="senha">
-    </ion-input>
-  </ion-item>
+      <ion-item>
+        <ion-input
+          label="Nome"
+          labelPlacement="floating"
+          formControlName="name">
+        </ion-input>
+      </ion-item>
+      <p class="erro" *ngIf="form.get('name')?.touched && form.get('name')?.invalid">
+        {{ getMensagemErro('name') }}
+      </p>
 
-  <ion-button expand="block" (click)="cadastrar()">
-    Cadastrar
-  </ion-button>
+      <ion-item>
+        <ion-input
+          label="Email"
+          type="email"
+          labelPlacement="floating"
+          formControlName="email">
+        </ion-input>
+      </ion-item>
+      <p class="erro" *ngIf="form.get('email')?.touched && form.get('email')?.invalid">
+        {{ getMensagemErro('email') }}
+      </p>
 
-  <ion-button expand="block" fill="clear" (click)="voltarLogin()">
-    Já tenho conta
-  </ion-button>
+      <ion-item>
+        <ion-input
+          label="Senha"
+          type="password"
+          labelPlacement="floating"
+          formControlName="senha">
+        </ion-input>
+      </ion-item>
+      <p class="erro" *ngIf="form.get('senha')?.touched && form.get('senha')?.invalid">
+        {{ getMensagemErro('senha') }}
+      </p>
 
-  <ion-button expand="block" (click)="voltarRegras()">
-    Voltar para Regras
-  </ion-button>
+      <ion-button
+        expand="block"
+        class="main-btn"
+        (click)="cadastrar()"
+        [disabled]="form.invalid">
+        Cadastrar
+      </ion-button>
+
+    </form>
+
+    <ion-button expand="block" fill="clear" class="small-btn" (click)="voltarRegras()">
+      Voltar para Regras
+    </ion-button>
+
+    <ion-button expand="block" fill="clear" class="small-btn" (click)="voltarLogin()">
+      Já tenho conta
+    </ion-button>
+
+  </div>
+
+  <ion-toast #toast position="bottom"></ion-toast>
 
 </ion-content>
