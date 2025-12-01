@@ -327,86 +327,118 @@ usedHints = {
 normalizeTeamName(name: string): string {
   return name
     .toLowerCase()
-    .replace(/[^a-zA-ZÀ-ú0-9\s]/g, "") 
-    .replace(/\b(fc|cf|sc|afc|ec|ac|de|da|do|the)\b/g, "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "") // remove acentos
+    .replace(/\./g, "") // remove pontos
+
+    // remove siglas entre parênteses também
+    .replace(/\(.*?\)/g, "")
+
+    // remove siglas tipo FR, FBPA, PR, SC, FC, CP, etc.
+    .replace(/\b([a-z]{2,4})\b/g, "")
+
+    // remove palavras inúteis
+    .replace(/\b(f|c|s)?(fc|cf|sc|afc|acf|ec|ac|as|de|da|do|the)\b/g, "")
+    .replace(/\b(fc|cf|sc|ec|ac|afc)\b/g, "")
+
     .replace(/\s+/g, " ")
     .trim();
 }
 
 
+cleanTeamName(name: string): string {
+  return name
+    // remove siglas entre parênteses → (LEV), (BET), etc.
+    .replace(/\(.*?\)/g, "")
+
+    // remove siglas de 2, 3 ou 4 letras no final (FR, FC, FBPA, CR, PR, SC, etc.)
+    .replace(/\b([A-Z]{2,4})\b/g, "")
+
+    // remove números (ex: "Bayer 04 Leverkusen")
+    .replace(/\b\d+\b/g, "")
+
+    // remove multispaços
+    .replace(/\s+/g, " ")
+
+    // remove espaços extras
+    .trim();
+}
+
+
+
+
+
+async checkAnswer() {
+  if (!this.currentTeam || this.gameOver) return;
+
+  const correctName = this.normalizeTeamName(this.currentTeam.name);
+  const guess = this.normalizeTeamName(this.userGuess);
+
   // =========================
-  // VERIFICA A RESPOSTA
+  // ✔️ JOGADOR ACERTOU
   // =========================
-    async checkAnswer() {
-    if (!this.currentTeam || this.gameOver) return;
+  if (guess === correctName) {
+    this.won = true;
+    this.gameOver = true;
 
-    const correctName = this.normalizeTeamName(this.currentTeam.name);
-    const guess = this.normalizeTeamName(this.userGuess);
+    const earnedPoints = this.attempts * 10;
 
-    // =========================
-    // ✔️ JOGADOR ACERTOU
-    // =========================
-    if (guess === correctName) {
-      this.won = true;
-      this.gameOver = true;
-      
-      const earnedPoints = this.attempts * 10;
-
-      // 🔥 Atualiza no Firestore
-      await this.userData.addVictory();
-      await this.userData.addPoints(earnedPoints);
-
-      const alert = await this.alertController.create({
-        header: '🎉 Parabéns!',
-        message: `Você acertou! O time era ${this.currentTeam.shortName}. +${earnedPoints} pontos!`,
-        buttons: ['OK']
-      });
-      await alert.present();
-
-      return;
-    }
-
-    // =========================
-    // ❌ ERROU A RESPOSTA
-    // =========================
-    this.attempts--;
-
-    // =========================
-    // 💀 FIM DE JOGO — PERDEU
-    // =========================
-    if (this.attempts <= 0) {
-      this.gameOver = true;
-
-      // 🔥 Atualiza derrota no Firestore
-      await this.userData.addLoss();
-
-      const alert = await this.alertController.create({
-        header: '💀 Fim de jogo!',
-        message: `O time era ${this.currentTeam.shortName} (${this.currentTeam.tla}).`,
-        buttons: ['OK']
-      });
-      await alert.present();
-      return;
-    }
-
-    // =========================
-    // ❌ ERRO NORMAL — AINDA TEM TENTATIVAS
-    // =========================
-    let hintMessage = `❌ Errado! ${this.attempts} tentativa(s) restante(s).`;
-
-    if (this.attempts === 2) {
-      hintMessage += ` Dica: País: ${this.currentTeam.country}`;
-    } else if (this.attempts === 1) {
-      hintMessage += ` Cidade: ${this.getCityFromVenue(this.currentTeam.venue)}`;
-    }
+    // Atualiza no Firestore
+    await this.userData.addVictory();
+    await this.userData.addPoints(earnedPoints);
 
     const alert = await this.alertController.create({
-      header: 'Tente novamente!',
-      message: hintMessage,
+      header: '🎉 Parabéns!',
+      message: `Você acertou! O time era ${this.cleanTeamName(this.currentTeam.name)}. +${earnedPoints} pontos!`,
       buttons: ['OK']
     });
     await alert.present();
+
+    return;
   }
+
+  // =========================
+  // ❌ ERROU A RESPOSTA
+  // =========================
+  this.attempts--;
+
+  // =========================
+  // 💀 FIM DE JOGO — PERDEU
+  // =========================
+  if (this.attempts <= 0) {
+    this.gameOver = true;
+
+    await this.userData.addLoss();
+
+    const alert = await this.alertController.create({
+      header: '💀 Fim de jogo!',
+      message: `O time era ${this.cleanTeamName(this.currentTeam.name)}.`,
+      buttons: ['OK']
+    });
+    await alert.present();
+
+    return;
+  }
+
+  // =========================
+  // ❌ ERRO NORMAL — AINDA TEM TENTATIVAS
+  // =========================
+  let hintMessage = `❌ Errado! ${this.attempts} tentativa(s) restante(s).`;
+
+  if (this.attempts === 2) {
+    hintMessage += ` Dica: País: ${this.currentTeam.country}`;
+  } else if (this.attempts === 1) {
+    hintMessage += ` Cidade: ${this.getCityFromVenue(this.currentTeam.venue)}`;
+  }
+
+  const alert = await this.alertController.create({
+    header: 'Tente novamente!',
+    message: hintMessage,
+    buttons: ['OK']
+  });
+
+  await alert.present();
+}
 
 onCardClick() {
   if (!this.currentTeam || this.gameOver) return;
