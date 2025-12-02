@@ -7,7 +7,7 @@
     <div class="score-board">
       <ion-chip color="success">
         <ion-icon name="trophy" color="warning"></ion-icon>
-        <ion-label>Pontuação: {{ score }}</ion-label>
+        <ion-label>Pontuação: {{ totalPoints$ | async }}</ion-label>
       </ion-chip>
     </div>
   </div>
@@ -51,9 +51,8 @@
           [class.revealed]="gameOver">
         <div class="league-badge">{{ getLeagueName() }}</div>
       </div>
-    -->
-      <!-- Dicas -->
-          <!-- Dicas -->
+      -->
+          
       <div class="icon-row">
 
         <ion-card class="hint-card" (click)="showHint('colors')">

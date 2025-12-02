@@ -1,7 +1,15 @@
 {
-  "name": "project",
+  "name": "ionic-football-app",
   "integrations": {
     "capacitor": {}
   },
-  "type": "angular-standalone"
+  "type": "angular",
+  "proxies": [
+    {
+      "path": "/v4",
+      "proxyUrl": "https://api.football-data.org/v4",
+      "changeOrigin": true,
+      "secure": true
+    }
+  ]
 }

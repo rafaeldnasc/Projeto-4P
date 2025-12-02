@@ -1,96 +1,22 @@
 import { Component, OnInit } from '@angular/core';
-import {
-  IonContent,
-  IonCard,
-  IonCardHeader,
-  IonCardTitle,
-  IonCardContent,
-  IonIcon,
-  IonLabel,
-  IonButton,
-  AlertController,
-  IonCardSubtitle,
-  IonText,
-  IonChip,
-  IonSpinner,
-  IonSegment,
-  IonSegmentButton,
-  IonInput
-} from '@ionic/angular/standalone';
-
+import { IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonIcon, IonLabel, IonButton, AlertController, IonCardSubtitle, IonText, IonChip, IonSpinner, IonSegment, IonSegmentButton, IonInput } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { 
-  shirtOutline, 
-  trophyOutline, 
-  mapOutline, 
-  colorPaletteOutline,
-  flagOutline,
-  businessOutline,
-  calendarOutline,
-  locationOutline,
-  bulbOutline,
-  trophy,
-  sad
-} from 'ionicons/icons';
+import { shirtOutline, trophyOutline, mapOutline, colorPaletteOutline, flagOutline, businessOutline, locationOutline, bulb, trophy} from 'ionicons/icons';
 import { CommonModule } from '@angular/common';
-import { HttpClient, HttpClientModule, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
+import { UserDataService } from '../services/userdata.service';
+import { FallbackService, Team } from '../services/fallback.service';
 import { environment } from 'src/environments/environment';
-import { UserDataService } from '../services/user-data.service';
-
-
-// =========================
-// INTERFACES
-// =========================
-interface Team {
-  id: number;
-  name: string;
-  shortName: string;
-  tla: string;
-  crest: string;
-  founded: number;
-  venue: string;
-  clubColors: string;
-  area: {
-    name: string;
-  };
-  country: string;
-  league: string;
-}
-
-interface CompetitionResponse {
-  teams: Team[];
-}
+import { Observable } from 'rxjs'
 
 @Component({
   selector: 'app-tab2',
   templateUrl: 'tab2.page.html',
   styleUrls: ['tab2.page.scss'],
   standalone: true,
-  imports: [
-    IonContent,
-    IonCard,
-    IonCardHeader,
-    IonCardTitle,
-    IonCardContent,
-    IonCardSubtitle,
-    IonIcon,
-    IonLabel,
-    IonButton,
-    IonText,
-    IonChip,
-    IonSpinner,
-    IonSegment,
-    IonSegmentButton,
-    CommonModule,
-    HttpClientModule,
-    IonInput
-  ]
+  imports: [IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonCardSubtitle, IonIcon, IonLabel, IonButton, IonText, IonChip, IonSpinner, IonSegment, IonSegmentButton, CommonModule, IonInput]
 })
 export class Tab2Page implements OnInit {
-
-  // ------------------------
-  // VARIÁVEIS DO JOGO
-  // ------------------------
   currentTeam: Team | null = null;
   currentHint: string = '';
   userGuess: string = '';
@@ -99,7 +25,8 @@ export class Tab2Page implements OnInit {
   gameOver: boolean = false;
   won: boolean = false;
   isLoading: boolean = false;
-  score: number = 0;
+
+  totalPoints$!: Observable<number>;
 
   leagues = [
     { id: 'PL', name: 'Premier League' },
@@ -112,58 +39,14 @@ export class Tab2Page implements OnInit {
 
   selectedLeague: string = 'PL';
 
-  // Base de dados completa com times reais
-  private teamsData: { [key: string]: Team[] } = {
-    PL: [
-      { id: 1, name: 'Arsenal FC', shortName: 'Arsenal', tla: 'ARS', crest: 'https://crests.football-data.org/57.png', founded: 1886, venue: 'Emirates Stadium', clubColors: 'Vermelho / Branco', area: { name: 'England' }, country: 'Inglaterra', league: 'Premier League' },
-      { id: 2, name: 'Chelsea FC', shortName: 'Chelsea', tla: 'CHE', crest: 'https://crests.football-data.org/61.png', founded: 1905, venue: 'Stamford Bridge', clubColors: 'Azul / Branco', area: { name: 'England' }, country: 'Inglaterra', league: 'Premier League' },
-      { id: 3, name: 'Liverpool FC', shortName: 'Liverpool', tla: 'LIV', crest: 'https://crests.football-data.org/64.png', founded: 1892, venue: 'Anfield', clubColors: 'Vermelho / Branco', area: { name: 'England' }, country: 'Inglaterra', league: 'Premier League' },
-      { id: 4, name: 'Manchester City', shortName: 'Man City', tla: 'MCI', crest: 'https://crests.football-data.org/65.png', founded: 1880, venue: 'Etihad Stadium', clubColors: 'Azul/ Branco', area: { name: 'England' }, country: 'Inglaterra', league: 'Premier League' },
-      { id: 5, name: 'Manchester United', shortName: 'Man United', tla: 'MUN', crest: 'https://crests.football-data.org/66.png', founded: 1878, venue: 'Old Trafford', clubColors: 'Vermelho / Branco', area: { name: 'England' }, country: 'Inglaterra', league: 'Premier League' },
-      { id: 6, name: 'Tottenham Hotspur', shortName: 'Tottenham', tla: 'TOT', crest: 'https://crests.football-data.org/73.png', founded: 1882, venue: 'Tottenham Hotspur Stadium', clubColors: 'Branco / Azul', area: { name: 'England' }, country: 'Inglaterra', league: 'Premier League' }
-    ],
-    PD: [
-      { id: 7, name: 'FC Barcelona', shortName: 'Barcelona', tla: 'FCB', crest: 'https://crests.football-data.org/81.png', founded: 1899, venue: 'Spotify Camp Nou', clubColors: 'Vermelho/ Azul', area: { name: 'Spain' }, country: 'Espanha', league: 'La Liga' },
-      { id: 8, name: 'Real Madrid CF', shortName: 'Real Madrid', tla: 'RMA', crest: 'https://crests.football-data.org/86.png', founded: 1902, venue: 'Estadio Santiago Bernabéu', clubColors: 'Branco / Roxo', area: { name: 'Spain' }, country: 'Espanha', league: 'La Liga' },
-      { id: 9, name: 'Atlético de Madrid', shortName: 'Atlético Madrid', tla: 'ATM', crest: 'https://crests.football-data.org/78.png', founded: 1903, venue: 'Estadio Cívitas Metropolitano', clubColors: 'Vermelho / Branco / Azul', area: { name: 'Spain' }, country: 'Espanha', league: 'La Liga' },
-      { id: 10, name: 'Sevilla FC', shortName: 'Sevilla', tla: 'SEV', crest: 'https://crests.football-data.org/559.png', founded: 1890, venue: 'Ramón Sánchez Pizjuán', clubColors: 'Branco / Vermelho', area: { name: 'Spain' }, country: 'Espanha', league: 'La Liga' },
-      { id: 11, name: 'Valencia CF', shortName: 'Valencia', tla: 'VAL', crest: 'https://crests.football-data.org/95.png', founded: 1919, venue: 'Estadio de Mestalla', clubColors: 'Branco/ Preto', area: { name: 'Spain' }, country: 'Espanha', league: 'La Liga' }
-    ],
-    SA: [
-      { id: 12, name: 'Juventus FC', shortName: 'Juventus', tla: 'JUV', crest: 'https://crests.football-data.org/109.png', founded: 1897, venue: 'Allianz Stadium', clubColors: 'Preto / Branco', area: { name: 'Italy' }, country: 'Italia', league: 'Serie A' },
-      { id: 13, name: 'AC Milan', shortName: 'Milan', tla: 'MIL', crest: 'https://crests.football-data.org/98.png', founded: 1899, venue: 'San Siro', clubColors: 'Vermelho / Preto', area: { name: 'Italy' }, country: 'Italia', league: 'Serie A' },
-      { id: 14, name: 'Inter Milan', shortName: 'Inter', tla: 'INT', crest: 'https://crests.football-data.org/108.png', founded: 1908, venue: 'San Siro', clubColors: 'Azul / Preto', area: { name: 'Italy' }, country: 'Italia', league: 'Serie A' },
-      { id: 15, name: 'AS Roma', shortName: 'Roma', tla: 'ROM', crest: 'https://crests.football-data.org/100.png', founded: 1927, venue: 'Stadio Olimpico', clubColors: 'Vermelho / Laranja', area: { name: 'Italy' }, country: 'Italia', league: 'Serie A' },
-      { id: 16, name: 'SSC Napoli', shortName: 'Napoli', tla: 'NAP', crest: 'https://crests.football-data.org/113.png', founded: 1926, venue: 'Diego Armando Maradona', clubColors: 'Azul / Branco', area: { name: 'Italy' }, country: 'Italia', league: 'Serie A' }
-    ],
-    BL1: [
-      { id: 17, name: 'FC Bayern München', shortName: 'Bayern Munich', tla: 'FCB', crest: 'https://crests.football-data.org/5.png', founded: 1900, venue: 'Allianz Arena', clubColors: 'Vermelho / Branco', area: { name: 'Germany' }, country: 'Alemenha', league: 'Bundesliga' },
-      { id: 18, name: 'Borussia Dortmund', shortName: 'Dortmund', tla: 'BVB', crest: 'https://crests.football-data.org/4.png', founded: 1909, venue: 'Signal Iduna Park', clubColors: 'Preto / Amarelo', area: { name: 'Germany' }, country: 'Alemenha', league: 'Bundesliga' },
-      { id: 19, name: 'RB Leipzig', shortName: 'RB Leipzig', tla: 'RBL', crest: 'https://crests.football-data.org/721.png', founded: 2009, venue: 'Red Bull Arena', clubColors: 'Branco / Vermelho', area: { name: 'Germany' }, country: 'Alemenha', league: 'Bundesliga' },
-      { id: 20, name: 'Bayer 04 Leverkusen', shortName: 'Leverkusen', tla: 'B04', crest: 'https://crests.football-data.org/3.png', founded: 1904, venue: 'BayArena', clubColors: 'Vermelho / Preto / Branco', area: { name: 'Germany' }, country: 'Alemenha', league: 'Bundesliga' }
-    ],
-    FL1: [
-      { id: 21, name: 'Paris Saint-Germain', shortName: 'PSG', tla: 'PSG', crest: 'https://crests.football-data.org/524.png', founded: 1970, venue: 'Parc des Princes', clubColors: 'Vermelho / Azul / Branco', area: { name: 'France' }, country: 'França', league: 'Ligue 1' },
-      { id: 22, name: 'Olympique de Marseille', shortName: 'Marseille', tla: 'OLM', crest: 'https://crests.football-data.org/516.png', founded: 1899, venue: 'Stade Vélodrome', clubColors: 'Branco / Azul', area: { name: 'France' }, country: 'França', league: 'Ligue 1' },
-      { id: 23, name: 'AS Monaco', shortName: 'Monaco', tla: 'ASM', crest: 'https://crests.football-data.org/548.png', founded: 1924, venue: 'Stade Louis-II', clubColors: 'Vermelho / Branco', area: { name: 'France' }, country: 'França', league: 'Ligue 1' },
-      { id: 24, name: 'Olympique Lyonnais', shortName: 'Lyon', tla: 'OL', crest: 'https://crests.football-data.org/523.png', founded: 1950, venue: 'Groupama Stadium', clubColors: 'Azul/ Branco / Vermelho', area: { name: 'France' }, country: 'França', league: 'Ligue 1' }
-    ],
-    BSA: [
-      { id: 25, name: 'Flamengo', shortName: 'Flamengo', tla: 'FLA', crest: 'https://crests.football-data.org/1769.png', founded: 1895, venue: 'Maracanã', clubColors: 'Vermelho / Preto', area: { name: 'Brazil' }, country: 'Brasil', league: 'Brasileirão' },
-      { id: 26, name: 'Palmeiras', shortName: 'Palmeiras', tla: 'PAL', crest: 'https://crests.football-data.org/1764.png', founded: 1914, venue: 'Allianz Parque', clubColors: 'Verde / Branco', area: { name: 'Brazil' }, country: 'Brasil', league: 'Brasileirão' },
-      { id: 27, name: 'São Paulo FC', shortName: 'São Paulo', tla: 'SAO', crest: 'https://crests.football-data.org/1765.png', founded: 1930, venue: 'Morumbi', clubColors: 'Vermelho / Preto/ Branco', area: { name: 'Brazil' }, country: 'Brasil', league: 'Brasileirão' },
-      { id: 28, name: 'Corinthians', shortName: 'Corinthians', tla: 'COR', crest: 'https://crests.football-data.org/1767.png', founded: 1910, venue: 'Neo Química Arena', clubColors: 'Preto / Branco', area: { name: 'Brazil' }, country: 'Brasil', league: 'Brasileirão' },
-      { id: 29, name: 'Grêmio FBPA', shortName: 'Grêmio', tla: 'GRE', crest: 'https://crests.football-data.org/1768.png', founded: 1903, venue: 'Arena do Grêmio', clubColors: 'Azul / Preto / Branco', area: { name: 'Brazil' }, country: 'Brasil', league: 'Brasileirão' }
-    ]
-  };
-
-  private apiUrl = 'https://api.football-data.org/v4';
-  private apiKey = environment.FOOBALL_API_KEY; 
+  // SUA API KEY - coloque aqui ou no environment
+  private apiKey = environment.FOOBALL_API_KEY; // ← COLOCAR SUA CHAVE!
 
   constructor(
     private alertController: AlertController,
     private http: HttpClient,
-    private userData: UserDataService 
+    private userData: UserDataService,
+    private fallback: FallbackService
   ) {
     addIcons({ 
       shirtOutline, 
@@ -172,92 +55,123 @@ export class Tab2Page implements OnInit {
       colorPaletteOutline,
       flagOutline,
       businessOutline,
-      calendarOutline,
-      locationOutline,
-      bulbOutline,
-      trophy,
-      sad
+      locationOutline, 
+      bulb,
+      trophy
     });
   }
-  
-usedHints = {
-  colors: false,
-  country: false,
-  stadium: false,
-  founded: false,
-  city: false
-};
 
-  // =========================
-  // INICIALIZAÇÃO
-  // =========================
   ngOnInit() {
+    console.log('🚀 Tab2 inicializado');
+    this.totalPoints$ = this.userData.totalPoints$;
     this.loadRandomTeam();
   }
 
-  // =========================
-  // CARREGA TIME ALEATÓRIO
-  // =========================
   async loadRandomTeam() {
-  this.isLoading = true;
+    this.isLoading = true;
+    console.log(`⚽ Buscando times da ${this.getLeagueName()}...`);
+    
+    try {
+      const url = `/v4/competitions/${this.selectedLeague}/teams`;
 
-  try {
-    const headers = new HttpHeaders({
-      'X-Auth-Token': this.apiKey
-    });
-
-    this.http.get<CompetitionResponse>(
-  `/api/competitions/${this.selectedLeague}/teams`,
-  { headers }
-  ).subscribe({
-      next: (response) => {
-        const teams = response.teams;
-        if (teams && teams.length > 0) {
-          const randomIndex = Math.floor(Math.random() * teams.length);
-          this.currentTeam = teams[randomIndex];
-          this.otpLength = 3; 
-          this.resetGame();
-        } else {
-          this.useFallbackData();
+      console.log('🌐 Chamando API:', url);
+      
+      const response = await fetch(url, {
+        headers: {
+          'X-Auth-Token': this.apiKey,
+          'Content-Type': 'application/json'
         }
-        this.isLoading = false;
-      },
-      error: (err) => {
-        console.log("Erro na API:", err);
-        this.useFallbackData();
-        this.isLoading = false;
+      });
+      
+      if (!response.ok) {
+        throw new Error(`API Error: ${response.status} ${response.statusText}`);
       }
-    });
-
-  } catch (error) {
-    this.useFallbackData();
-    this.isLoading = false;
+      
+      const data = await response.json();
+      console.log(`✅ ${data.teams?.length || 0} times recebidos`);
+      
+      if (data.teams && data.teams.length > 0) {
+        // Seleciona time aleatório
+        const randomIndex = Math.floor(Math.random() * data.teams.length);
+        const apiTeam = data.teams[randomIndex];
+        
+        // Converte para formato do seu Team
+        this.currentTeam = {
+          id: apiTeam.id,
+          name: apiTeam.name,
+          shortName: apiTeam.shortName || apiTeam.name,
+          tla: apiTeam.tla || apiTeam.shortName?.substring(0, 3).toUpperCase() || 'TLA',
+          crest: apiTeam.crest || `https://crests.football-data.org/${apiTeam.id}.png`,
+          founded: apiTeam.founded || 1900,
+          venue: apiTeam.venue || 'Estádio desconhecido',
+          clubColors: apiTeam.clubColors || 'Preto / Branco',
+          area: { name: apiTeam.area?.name || 'Desconhecido' },
+          country: this.getCountryFromArea(apiTeam.area?.name),
+          league: this.getLeagueName()
+        };
+        
+        this.otpLength = 3;
+        this.resetGame();
+        
+        console.log('🎯 Time selecionado:', this.currentTeam.name);
+        console.log('📊 Dados:', {
+          id: this.currentTeam.id,
+          país: this.currentTeam.country,
+          estádio: this.currentTeam.venue,
+          fundado: this.currentTeam.founded
+        });
+        
+      } else {
+        console.warn('⚠️ API retornou sem times, usando fallback');
+        this.useFallback();
+      }
+      
+    } catch (error) {
+      console.error('❌ Erro na API:', error);
+      console.log('🔄 Usando fallback...');
+      this.useFallback();
+      
+    } finally {
+      this.isLoading = false;
+    }
   }
-}
 
+  private getCountryFromArea(areaName: string): string {
+    const countryMap: {[key: string]: string} = {
+      'England': 'Inglaterra',
+      'Spain': 'Espanha',
+      'Italy': 'Itália',
+      'Germany': 'Alemanha',
+      'France': 'França',
+      'Brazil': 'Brasil',
+      'Portugal': 'Portugal',
+      'Netherlands': 'Holanda'
+    };
+    return countryMap[areaName] || areaName || 'Desconhecido';
+  }
 
-  // =========================
-  // FALLBACK SE API FALHAR
-  // =========================
-  useFallbackData() {
-    const teams = this.teamsData[this.selectedLeague];
-    if (teams && teams.length > 0) {
-      const randomIndex = Math.floor(Math.random() * teams.length);
-      this.currentTeam = teams[randomIndex];
+  private useFallback() {
+    const fb = this.fallback.getRandomTeam(this.selectedLeague);
+    if (fb) {
+      this.currentTeam = fb;
       this.otpLength = 3;
       this.resetGame();
+      console.log('📦 Usando fallback:', fb.name);
+    } else {
+      console.error('💀 Sem dados disponíveis!');
+      // Pode mostrar um alerta ao usuário
     }
   }
 
   // =========================
-  // DICAS
+  // DICAS (mantenha seu código atual)
   // =========================
   showHint(type: string) {
     if (!this.currentTeam) return;
 
     switch(type) {
       case 'colors':
-        this.currentHint = `🎨 Cor da camisa: ${this.currentTeam.clubColors}`;
+        this.currentHint = `🎨 Cores: ${this.currentTeam.clubColors}`;
         break;
       case 'country':
         this.currentHint = `🏴 País: ${this.currentTeam.country}`;
@@ -276,6 +190,7 @@ usedHints = {
   }
 
   getCityFromVenue(venue: string): string {
+    // Mantenha seu código atual
     const cities: {[key: string]: string} = {
       'Old Trafford': 'Manchester',
       'Anfield': 'Liverpool',
@@ -315,152 +230,105 @@ usedHints = {
   }
 
   // =========================
-  // INPUT DO USUÁRIO
+  // INPUT E RESPOSTA (mantenha seu código)
   // =========================
   onInputChange(event: any) {
     this.userGuess = event.detail.value.toUpperCase();
   }
 
-  // =========================
-// NORMALIZA O NOME (remove FC, CF, SC, etc)
-// =========================
-normalizeTeamName(name: string): string {
-  return name
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "") // remove acentos
-    .replace(/\./g, "") // remove pontos
+  normalizeTeamName(name: string): string {
+    return name
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/\./g, "")
+      .replace(/\(.*?\)/g, "")
+      .replace(/\b([a-z]{2,4})\b/g, "")
+      .replace(/\b(f|c|s)?(fc|cf|sc|afc|acf|ec|ac|as|de|da|do|the)\b/g, "")
+      .replace(/\b(fc|cf|sc|ec|ac|afc)\b/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
 
-    // remove siglas entre parênteses também
-    .replace(/\(.*?\)/g, "")
+  cleanTeamName(name: string): string {
+    return name
+      .replace(/\(.*?\)/g, "")
+      .replace(/\b([A-Z]{2,4})\b/g, "")
+      .replace(/\b\d+\b/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
 
-    // remove siglas tipo FR, FBPA, PR, SC, FC, CP, etc.
-    .replace(/\b([a-z]{2,4})\b/g, "")
+  async checkAnswer() {
+    if (!this.currentTeam || this.gameOver) return;
 
-    // remove palavras inúteis
-    .replace(/\b(f|c|s)?(fc|cf|sc|afc|acf|ec|ac|as|de|da|do|the)\b/g, "")
-    .replace(/\b(fc|cf|sc|ec|ac|afc)\b/g, "")
+    const correctName = this.normalizeTeamName(this.currentTeam.name);
+    const guess = this.normalizeTeamName(this.userGuess);
 
-    .replace(/\s+/g, " ")
-    .trim();
-}
+    if (guess === correctName) {
+      this.won = true;
+      this.gameOver = true;
 
+      const earnedPoints = this.attempts * 10;
 
-cleanTeamName(name: string): string {
-  return name
-    // remove siglas entre parênteses → (LEV), (BET), etc.
-    .replace(/\(.*?\)/g, "")
+      await this.userData.addVictory();
+      await this.userData.addPoints(earnedPoints);
 
-    // remove siglas de 2, 3 ou 4 letras no final (FR, FC, FBPA, CR, PR, SC, etc.)
-    .replace(/\b([A-Z]{2,4})\b/g, "")
+      const alert = await this.alertController.create({
+        header: '🎉 Parabéns!',
+        message: `Você acertou! O time era ${this.cleanTeamName(this.currentTeam.name)}. +${earnedPoints} pontos!`,
+        buttons: ['OK']
+      });
+      await alert.present();
+      return;
+    }
 
-    // remove números (ex: "Bayer 04 Leverkusen")
-    .replace(/\b\d+\b/g, "")
+    this.attempts--;
 
-    // remove multispaços
-    .replace(/\s+/g, " ")
+    if (this.attempts <= 0) {
+      this.gameOver = true;
+      await this.userData.addLoss();
 
-    // remove espaços extras
-    .trim();
-}
+      const alert = await this.alertController.create({
+        header: '💀 Fim de jogo!',
+        message: `O time era ${this.cleanTeamName(this.currentTeam.name)}.`,
+        buttons: ['OK']
+      });
+      await alert.present();
+      return;
+    }
 
+    let hintMessage = `❌ Errado! ${this.attempts} tentativa(s) restante(s).`;
 
-
-
-
-async checkAnswer() {
-  if (!this.currentTeam || this.gameOver) return;
-
-  const correctName = this.normalizeTeamName(this.currentTeam.name);
-  const guess = this.normalizeTeamName(this.userGuess);
-
-  // =========================
-  // ✔️ JOGADOR ACERTOU
-  // =========================
-  if (guess === correctName) {
-    this.won = true;
-    this.gameOver = true;
-
-    const earnedPoints = this.attempts * 10;
-
-    // Atualiza no Firestore
-    await this.userData.addVictory();
-    await this.userData.addPoints(earnedPoints);
+    if (this.attempts === 2) {
+      hintMessage += ` Dica: País: ${this.currentTeam.country}`;
+    } else if (this.attempts === 1) {
+      hintMessage += ` Cidade: ${this.getCityFromVenue(this.currentTeam.venue)}`;
+    }
 
     const alert = await this.alertController.create({
-      header: '🎉 Parabéns!',
-      message: `Você acertou! O time era ${this.cleanTeamName(this.currentTeam.name)}. +${earnedPoints} pontos!`,
+      header: 'Tente novamente!',
+      message: hintMessage,
       buttons: ['OK']
     });
+
     await alert.present();
-
-    return;
   }
 
-  // =========================
-  // ❌ ERROU A RESPOSTA
-  // =========================
-  this.attempts--;
+  onCardClick() {
+    if (!this.currentTeam || this.gameOver) return;
 
-  // =========================
-  // 💀 FIM DE JOGO — PERDEU
-  // =========================
-  if (this.attempts <= 0) {
-    this.gameOver = true;
+    const hints = [
+      `🎨 Cores: ${this.currentTeam.clubColors}`,
+      `🏟️ Estádio: ${this.currentTeam.venue}`,
+      `📅 Fundado em: ${this.currentTeam.founded}`,
+      `🏴 País: ${this.currentTeam.country}`,
+      `🏙️ Cidade: ${this.getCityFromVenue(this.currentTeam.venue)}`
+    ];
 
-    await this.userData.addLoss();
-
-    const alert = await this.alertController.create({
-      header: '💀 Fim de jogo!',
-      message: `O time era ${this.cleanTeamName(this.currentTeam.name)}.`,
-      buttons: ['OK']
-    });
-    await alert.present();
-
-    return;
+    this.currentHint = hints[Math.floor(Math.random() * hints.length)];
   }
 
-  // =========================
-  // ❌ ERRO NORMAL — AINDA TEM TENTATIVAS
-  // =========================
-  let hintMessage = `❌ Errado! ${this.attempts} tentativa(s) restante(s).`;
-
-  if (this.attempts === 2) {
-    hintMessage += ` Dica: País: ${this.currentTeam.country}`;
-  } else if (this.attempts === 1) {
-    hintMessage += ` Cidade: ${this.getCityFromVenue(this.currentTeam.venue)}`;
-  }
-
-  const alert = await this.alertController.create({
-    header: 'Tente novamente!',
-    message: hintMessage,
-    buttons: ['OK']
-  });
-
-  await alert.present();
-}
-
-onCardClick() {
-  if (!this.currentTeam || this.gameOver) return;
-
-  // Escolhe uma dica automática
-  const hints = [
-    `🎨 Cores: ${this.currentTeam.clubColors}`,
-    `🏟️ Estádio: ${this.currentTeam.venue}`,
-    `📅 Fundado em: ${this.currentTeam.founded}`,
-    `🏴 País: ${this.currentTeam.country}`,
-    `🏙️ Cidade: ${this.getCityFromVenue(this.currentTeam.venue)}`
-  ];
-
-  // Seleciona uma dica aleatória
-  this.currentHint = hints[Math.floor(Math.random() * hints.length)];
-}
-
-
-
-  // =========================
-  // RESETAR O JOGO
-  // =========================
   resetGame() {
     this.userGuess = '';
     this.currentHint = '';
@@ -469,26 +337,13 @@ onCardClick() {
     this.won = false;
   }
 
-  // =========================
-  // TROCA DE LIGA
-  // =========================
   changeLeague(event: any) {
     this.selectedLeague = event.detail.value;
     this.loadRandomTeam();
   }
 
-  // =========================
-  // PEGAR ESCUDO
-  // =========================
-
-
-  // =========================
-  // PEGAR NOME DA LIGA
-  // =========================
   getLeagueName(): string {
     return this.leagues.find(l => l.id === this.selectedLeague)?.name || 'Liga';
   }
-
-  
-
 }
+
